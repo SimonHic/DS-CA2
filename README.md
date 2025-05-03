@@ -20,7 +20,7 @@ __Feature:__
   + Status Update Mailer - Attempted.
 + Moderator:
   + Status updating
-+ Filtering - Attempted. (Metadata)
++ Filtering - Attempted. (Metadata, Image Process Queue)
 + Messaging
 
 ### Notes (Optional)
@@ -31,5 +31,5 @@ __Feature:__
 
 - https://stackoverflow.com/questions/31816906/why-does-dynamodb-require-expressionattributevalue#31817417
 - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html
-
+- https://www.dynamodbguide.com/expression-basics/#condition-expressions
 
