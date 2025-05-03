@@ -16,7 +16,7 @@ __Feature:__
 + Photographer:
   + Log new Images - Completed and Tested.
   + Metadata updating
-  + Invalid image removal - Attempted.
+  + Invalid image removal - Completed and Tested.
   + Status Update Mailer
 + Moderator
   + Status updating
