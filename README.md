@@ -14,9 +14,9 @@ This repository contains the implementation of a skeleton design for an applicat
 
 __Feature:__
 + Photographer:
-  + Log new Images
+  + Log new Images - Completed and Tested.
   + Metadata updating
-  + Invalid image removal  
+  + Invalid image removal - Attempted.
   + Status Update Mailer
 + Moderator
   + Status updating
