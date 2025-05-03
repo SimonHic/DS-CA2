@@ -25,8 +25,16 @@ export class EDAAppStack extends cdk.Stack {
 
       // Integration infrastructure
 
+  const imageDLQ = new sqs.Queue(this, "img-dead-letter-queue",{
+    queueName: "ImageDLQ",
+    retentionPeriod: cdk.Duration.minutes(5),
+  })    
   const imageProcessQueue = new sqs.Queue(this, "img-created-queue", {
     receiveMessageWaitTime: cdk.Duration.seconds(5),
+    deadLetterQueue:{
+      maxReceiveCount: 1,
+      queue: imageDLQ,
+    }
   });
 
   const mailerQ = new sqs.Queue(this, "mailer-queue", {
@@ -64,6 +72,13 @@ export class EDAAppStack extends cdk.Stack {
       },
     }
   );
+
+  const removeImageFn = new lambdanode.NodejsFunction(this, "RemoveImageFn",{
+    runtime:lambda.Runtime.NODEJS_22_X,
+    memorySize: 128,
+    timeout: cdk.Duration.seconds(10),
+    entry: `${__dirname}/../lambdas/removeImage.ts`,
+  })
 
   const mailerFn = new lambdanode.NodejsFunction(this, "mailer-function", {
     runtime: lambda.Runtime.NODEJS_16_X,
@@ -109,6 +124,15 @@ export class EDAAppStack extends cdk.Stack {
 
   imagesBucket.grantRead(processImageFn);
   imageTable.grantReadWriteData(processImageFn);
+  imagesBucket.grantDelete(removeImageFn);
+
+  // DLQ --> Remove Image Lambda
+  removeImageFn.addEventSource(
+    new events.SqsEventSource(imageDLQ,{
+      batchSize: 1,
+      maxBatchingWindow: cdk.Duration.seconds(5),
+    })
+  )
 
   // Output
   
