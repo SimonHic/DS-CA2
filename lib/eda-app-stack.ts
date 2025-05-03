@@ -8,6 +8,7 @@ import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as subs from "aws-cdk-lib/aws-sns-subscriptions";
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb"
 
 import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -35,6 +36,12 @@ export class EDAAppStack extends cdk.Stack {
   const newImageTopic = new sns.Topic(this, "NewImageTopic", {
     displayName: "New Image topic",
   }); 
+
+  const imageTable = new dynamodb.Table(this, "ImagesTable", {
+    partitionKey: {name: "imageId", type: dynamodb.AttributeType.STRING},
+    billingMode:dynamodb.BillingMode.PAY_PER_REQUEST,
+    removalPolicy: cdk.RemovalPolicy.DESTROY
+  })
   
   newImageTopic.addSubscription(
     new subs.SqsSubscription(imageProcessQueue)
@@ -52,6 +59,9 @@ export class EDAAppStack extends cdk.Stack {
       entry: `${__dirname}/../lambdas/processImage.ts`,
       timeout: cdk.Duration.seconds(15),
       memorySize: 128,
+      environment:{
+        IMAGE_TABLE_NAME: imageTable.tableName,
+      },
     }
   );
 
@@ -98,6 +108,7 @@ export class EDAAppStack extends cdk.Stack {
   // Permissions
 
   imagesBucket.grantRead(processImageFn);
+  imageTable.grantReadWriteData(processImageFn);
 
   // Output
   
