@@ -11,6 +11,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb"
 
 import { Construct } from "constructs";
+import { eventNames } from "node:process";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class EDAAppStack extends cdk.Stack {
@@ -51,9 +52,9 @@ export class EDAAppStack extends cdk.Stack {
     removalPolicy: cdk.RemovalPolicy.DESTROY
   })
   
-  newImageTopic.addSubscription(
+  /* newImageTopic.addSubscription(
     new subs.SqsSubscription(imageProcessQueue)
-  );
+  ); */
 
   newImageTopic.addSubscription(new subs.SqsSubscription(mailerQ));
 
@@ -98,6 +99,17 @@ export class EDAAppStack extends cdk.Stack {
     },
   })
 );
+
+// Make sure only S3 stuff is allowed
+newImageTopic.addSubscription(new subs.SqsSubscription(imageProcessQueue,{
+  filterPolicyWithMessageBody:{
+    Records: sns.FilterOrPolicy.policy({eventName:
+      sns.FilterOrPolicy.filter(sns.SubscriptionFilter.stringFilter({
+        allowlist: ["ObjectCreated:Put", "ObjectRemoved:Delete"],
+      })),
+    })
+  }
+}));
 
   const mailerFn = new lambdanode.NodejsFunction(this, "mailer-function", {
     runtime: lambda.Runtime.NODEJS_16_X,
