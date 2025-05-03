@@ -91,6 +91,16 @@ export class EDAAppStack extends cdk.Stack {
     }
   })
 
+  const updateStatusFn = new lambdanode.NodejsFunction(this, "UpdateStatusFn",{
+    runtime: lambda.Runtime.NODEJS_22_X,
+    entry: `${__dirname}/../lambdas/updateStatus.ts`,
+    timeout: cdk.Duration.seconds(10),
+    memorySize: 128,
+    environment:{
+      IMAGE_TABLE_NAME: imageTable.tableName,
+    },
+  });
+
   newImageTopic.addSubscription(new subs.LambdaSubscription(updateMetadataFn,{
     filterPolicy:{
       metadata_type: sns.SubscriptionFilter.stringFilter({
@@ -99,6 +109,8 @@ export class EDAAppStack extends cdk.Stack {
     },
   })
 );
+
+newImageTopic.addSubscription(new subs.LambdaSubscription(updateStatusFn));
 
 // Make sure only S3 stuff is allowed
 newImageTopic.addSubscription(new subs.SqsSubscription(imageProcessQueue,{
@@ -157,6 +169,7 @@ newImageTopic.addSubscription(new subs.SqsSubscription(imageProcessQueue,{
   imageTable.grantReadWriteData(processImageFn);
   imagesBucket.grantDelete(removeImageFn);
   imageTable.grantWriteData(updateMetadataFn);
+  imageTable.grantReadWriteData(updateStatusFn);
 
   // DLQ --> Remove Image Lambda
   removeImageFn.addEventSource(
