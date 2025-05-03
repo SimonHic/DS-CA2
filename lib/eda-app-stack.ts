@@ -80,6 +80,25 @@ export class EDAAppStack extends cdk.Stack {
     entry: `${__dirname}/../lambdas/removeImage.ts`,
   })
 
+  const updateMetadataFn = new lambdanode.NodejsFunction(this, "UpdateMetadataFn",{
+    runtime: lambda.Runtime.NODEJS_22_X,
+    entry: `${__dirname}/../lambdas/updateMetadata.ts`,
+    timeout: cdk.Duration.seconds(10),
+    memorySize: 128,
+    environment:{
+      IMAGE_TABLE_NAME: imageTable.tableName
+    }
+  })
+
+  newImageTopic.addSubscription(new subs.LambdaSubscription(updateMetadataFn,{
+    filterPolicy:{
+      metadata_type: sns.SubscriptionFilter.stringFilter({
+        allowlist: ["Name", "Date", "Caption"],
+      }),
+    },
+  })
+);
+
   const mailerFn = new lambdanode.NodejsFunction(this, "mailer-function", {
     runtime: lambda.Runtime.NODEJS_16_X,
     memorySize: 1024,
@@ -125,6 +144,7 @@ export class EDAAppStack extends cdk.Stack {
   imagesBucket.grantRead(processImageFn);
   imageTable.grantReadWriteData(processImageFn);
   imagesBucket.grantDelete(removeImageFn);
+  imageTable.grantWriteData(updateMetadataFn);
 
   // DLQ --> Remove Image Lambda
   removeImageFn.addEventSource(

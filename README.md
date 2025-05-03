@@ -35,4 +35,9 @@ __Feature:__
 
 [Any additional information about your solution you wish to draw attention to.]
 
+#### References/Resources
+
+- https://stackoverflow.com/questions/31816906/why-does-dynamodb-require-expressionattributevalue#31817417
+- https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html
+
 
