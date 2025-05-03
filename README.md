@@ -26,10 +26,13 @@ __Feature:__
 __Feature:__
 + Photographer:
   + Log new Images - Completed and Tested.
-  + Metadata updating - Not Attempted
-  + Invalid image removal - Completed and Tested
+  + Metadata updating - Completed and Tested.
+  + Invalid image removal - Completed and Tested.
   + Status Update Mailer - Attempted.
-+ etc
++ Moderator:
+  + Status updating
++ Filtering - Attempted. (Metadata)
++ Messaging
 
 ### Notes (Optional)
 
