@@ -19,9 +19,9 @@ __Feature:__
   + Invalid image removal - Completed and Tested.
   + Status Update Mailer - Attempted.
 + Moderator:
-  + Status updating
+  + Status updating - Completed and Tested.
 + Filtering - Attempted. (Metadata, Image Process Queue)
-+ Messaging
++ Messaging - Completed and Tested.
 
 ### Notes (Optional)
 
